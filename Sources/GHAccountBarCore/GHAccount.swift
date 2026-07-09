@@ -85,6 +85,7 @@ public enum GHStatusBarDisplay {
 
 public enum GHRefreshPolicy {
     public static let accountPollingInterval: TimeInterval = 2.0
+    public static let accountPollingRunLoopMode: RunLoop.Mode = .common
 }
 
 private struct GHAuthStatus: Decodable {

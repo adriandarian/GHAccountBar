@@ -93,3 +93,7 @@ import Testing
 @Test func refreshPolicyKeepsMenuStateFreshWithoutBeingAggressive() {
     #expect(GHRefreshPolicy.accountPollingInterval == 2.0)
 }
+
+@Test func refreshPolicyUsesCommonRunLoopModeForMenuTracking() {
+    #expect(GHRefreshPolicy.accountPollingRunLoopMode == .common)
+}

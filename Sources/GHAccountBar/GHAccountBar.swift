@@ -47,11 +47,13 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func startAutomaticRefresh() {
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: GHRefreshPolicy.accountPollingInterval, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: GHRefreshPolicy.accountPollingInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.refreshAccounts(showLoading: false)
             }
         }
+        refreshTimer = timer
+        RunLoop.main.add(timer, forMode: GHRefreshPolicy.accountPollingRunLoopMode)
     }
 
     private func refreshAccounts(showLoading: Bool) {
