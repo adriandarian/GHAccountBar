@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">GH Account Bar menu bar mockup</title>
+  <desc id="desc">A polished macOS menu bar mockup showing GH Account Bar switching between GitHub CLI accounts.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="0.52" stop-color="#e8f3ef"/>
+      <stop offset="1" stop-color="#f7eadf"/>
+    </linearGradient>
+    <linearGradient id="window" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f7fb"/>
+    </linearGradient>
+    <linearGradient id="terminal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#20242c"/>
+      <stop offset="1" stop-color="#101419"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="28" flood-color="#29323d" flood-opacity="0.22"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#29323d" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1318" cy="170" r="190" fill="#f8c66d" opacity="0.16"/>
+  <circle cx="215" cy="706" r="250" fill="#46a6a0" opacity="0.13"/>
+
+  <g filter="url(#shadow)">
+    <rect x="154" y="126" width="1292" height="648" rx="34" fill="url(#window)"/>
+    <rect x="154" y="126" width="1292" height="72" rx="34" fill="#ffffff"/>
+    <path d="M154 164a38 38 0 0 1 38-38h1216a38 38 0 0 1 38 38v34H154z" fill="#ffffff"/>
+    <circle cx="206" cy="163" r="12" fill="#ff665f"/>
+    <circle cx="245" cy="163" r="12" fill="#f7bf4f"/>
+    <circle cx="284" cy="163" r="12" fill="#59c66d"/>
+  </g>
+
+  <g transform="translate(226 268)">
+    <text x="0" y="0" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="64" font-weight="760" fill="#17202a">GH Account Bar</text>
+    <text x="0" y="58" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="500" fill="#4b5968">Switch GitHub CLI identities from the macOS menu bar.</text>
+
+    <g transform="translate(0 116)" filter="url(#softShadow)">
+      <rect x="0" y="0" width="460" height="232" rx="22" fill="url(#terminal)"/>
+      <circle cx="32" cy="30" r="7" fill="#ff665f"/>
+      <circle cx="58" cy="30" r="7" fill="#f7bf4f"/>
+      <circle cx="84" cy="30" r="7" fill="#59c66d"/>
+      <text x="32" y="78" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22" fill="#9ae6b4">$ gh auth status --json hosts</text>
+      <text x="32" y="120" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22" fill="#b9c7d5">personal-account  active</text>
+      <text x="32" y="158" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22" fill="#b9c7d5">work-account      ready</text>
+      <text x="32" y="199" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22" fill="#80d8ff">$ gh auth switch --user work-account</text>
+    </g>
+  </g>
+
+  <g transform="translate(812 250)" filter="url(#shadow)">
+    <rect x="0" y="0" width="524" height="48" rx="24" fill="#ffffff" opacity="0.95"/>
+    <text x="34" y="31" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="620" fill="#344050">Finder</text>
+    <text x="130" y="31" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="520" fill="#657386">File</text>
+    <text x="196" y="31" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="520" fill="#657386">Edit</text>
+    <text x="406" y="31" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="19" font-weight="620" fill="#344050">10:41</text>
+    <g transform="translate(468 13)">
+      <rect x="-8" y="-5" width="36" height="28" rx="14" fill="#17202a"/>
+      <text x="10" y="15" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="800" fill="#ffffff">GH</text>
+    </g>
+  </g>
+
+  <g transform="translate(934 318)" filter="url(#shadow)">
+    <rect x="0" y="0" width="360" height="376" rx="24" fill="#ffffff"/>
+    <rect x="0" y="0" width="360" height="376" rx="24" fill="none" stroke="#dbe2ea"/>
+    <g transform="translate(28 34)">
+      <circle cx="16" cy="16" r="16" fill="#2f855a"/>
+      <path d="M9 16.5l4.4 4.4L23.8 10.5" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="48" y="22" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="24" font-weight="720" fill="#17202a">personal-account</text>
+    </g>
+    <g transform="translate(28 92)">
+      <circle cx="16" cy="16" r="16" fill="#eef3f7" stroke="#cfd8e3"/>
+      <text x="48" y="22" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="24" font-weight="640" fill="#17202a">work-account</text>
+    </g>
+    <g transform="translate(28 150)">
+      <circle cx="16" cy="16" r="16" fill="#eef3f7" stroke="#cfd8e3"/>
+      <text x="48" y="22" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="24" font-weight="640" fill="#17202a">oss-maintainer</text>
+    </g>
+    <line x1="28" y1="226" x2="332" y2="226" stroke="#dbe2ea"/>
+    <text x="28" y="278" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="24" font-weight="650" fill="#344050">Refresh</text>
+    <line x1="28" y1="306" x2="332" y2="306" stroke="#dbe2ea"/>
+    <text x="28" y="348" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="24" font-weight="650" fill="#344050">Quit GH Account Bar</text>
+  </g>
+
+  <g transform="translate(756 672)">
+    <rect x="0" y="0" width="154" height="44" rx="22" fill="#17202a"/>
+    <text x="77" y="29" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" font-weight="760" fill="#ffffff">icon-only</text>
+  </g>
+</svg>
