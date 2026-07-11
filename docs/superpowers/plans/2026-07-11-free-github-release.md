@@ -103,7 +103,7 @@ on:
       - "v*"
 ```
 
-The job checks out the tag, runs `swift test`, runs the packaging test with the tag version and workflow build number, and creates or updates a prerelease using the installed `gh` CLI. Release notes state that the build is for Apple Silicon, requires macOS 14 and `gh`, and requires Control-click then Open on first launch.
+The job selects `/Applications/Xcode_26.3.app/Contents/Developer` through `DEVELOPER_DIR`, checks out the tag, reports `swift --version`, runs `swift test`, runs the packaging test with the tag version and workflow build number, and creates or updates a prerelease using the installed `gh` CLI. Release notes state that the build is for Apple Silicon, requires macOS 14 and `gh`, and requires Control-click then Open on first launch.
 
 - [ ] **Step 2: Add README installation instructions**
 

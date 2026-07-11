@@ -39,7 +39,7 @@ The app resolves the packaged icon through `Bundle.main`. Raw SwiftPM developmen
 4. Verifies the app architecture is arm64, validates the property list and signature, expands the ZIP, and checks the packaged app.
 5. Publishes the ZIP and checksum to a GitHub prerelease using the repository's `GITHUB_TOKEN`.
 
-The workflow uses only GitHub-provided actions and the public repository's standard macOS runner, so it requires no paid services or repository secrets.
+The workflow uses only GitHub-provided actions and the public repository's standard macOS runner, so it requires no paid services or repository secrets. It selects the runner's bundled Xcode 26.3 toolchain through `DEVELOPER_DIR` because the runner's default Xcode 16.4 toolchain provides Swift 6.1, while the package requires Swift 6.3.
 
 ## Local Verification
 
