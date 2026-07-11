@@ -499,7 +499,10 @@ private enum GHMenuBarIcon {
     }
 
     private static func templateImage() -> NSImage {
-        if let url = Bundle.module.url(forResource: "MenuBarIcon", withExtension: "png"),
+        let resourceURL = Bundle.main.url(forResource: "MenuBarIcon", withExtension: "png")
+            ?? Bundle.module.url(forResource: "MenuBarIcon", withExtension: "png")
+
+        if let url = resourceURL,
            let image = NSImage(contentsOf: url) {
             image.size = NSSize(width: 18, height: 18)
             image.isTemplate = true

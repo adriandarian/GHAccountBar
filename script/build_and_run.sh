@@ -11,8 +11,10 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
+APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$APP_NAME"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
+ICON_SOURCE="$ROOT_DIR/Sources/GHAccountBar/Resources/MenuBarIcon.png"
 
 cd "$ROOT_DIR"
 
@@ -22,8 +24,9 @@ swift build
 BUILD_BINARY="$(swift build --show-bin-path)/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_MACOS"
+mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
+cp "$ICON_SOURCE" "$APP_RESOURCES/MenuBarIcon.png"
 chmod +x "$APP_BINARY"
 
 cat >"$INFO_PLIST" <<PLIST

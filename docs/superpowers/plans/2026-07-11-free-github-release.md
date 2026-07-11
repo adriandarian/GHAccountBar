@@ -24,6 +24,8 @@
 **Files:**
 - Create: `Tests/Packaging/package_release_test.sh`
 - Create: `script/package_release.sh`
+- Modify: `script/build_and_run.sh`
+- Modify: `Sources/GHAccountBar/GHAccountBar.swift`
 
 **Interfaces:**
 - Consumes: semantic version as `$1`; positive numeric build number as optional `$2`
@@ -31,7 +33,7 @@
 
 - [ ] **Step 1: Write the failing packaging test**
 
-Create a shell test that accepts an optional version and build number (defaulting to `0.1.0` and `1`), rejects invalid input through direct packager calls, invokes the packager with the selected values, checks bundle metadata and resources, validates arm64 architecture and code signing, expands the ZIP, and verifies the checksum.
+Create a shell test that accepts an optional version and build number (defaulting to `0.1.0` and `1`), rejects invalid input through direct packager calls, invokes the packager with the selected values, checks bundle metadata and the standard `Contents/Resources/MenuBarIcon.png` path, validates arm64 architecture and code signing, expands the ZIP, and verifies the checksum.
 
 - [ ] **Step 2: Run the test to verify it fails because the packager is absent**
 
@@ -59,7 +61,7 @@ RESOURCE_BUNDLE="GHAccountBar_GHAccountBar.bundle"
 swift build -c release --arch arm64
 ```
 
-It then stages the executable and generated resource bundle, writes versioned `Info.plist` metadata, validates the property list, applies and verifies an ad-hoc signature, archives with `ditto --keepParent`, and writes a portable SHA-256 file from inside `dist`.
+It then stages the executable and `MenuBarIcon.png` under `Contents/Resources`, writes versioned `Info.plist` metadata, validates the property list, applies and verifies an ad-hoc signature, archives with `ditto --keepParent`, and writes a portable SHA-256 file from inside `dist`. The app and local builder prefer `Bundle.main` for the packaged icon while retaining `Bundle.module` for raw SwiftPM runs.
 
 - [ ] **Step 4: Run static checks and the packaging test**
 

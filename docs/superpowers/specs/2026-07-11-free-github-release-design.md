@@ -23,9 +23,11 @@ A new `script/package_release.sh` script owns distributable bundle construction.
 - `CFBundleVersion` from the workflow run number, or `1` for a local package
 - `LSUIElement = true`
 - the release executable under `Contents/MacOS`
-- the generated `GHAccountBar_GHAccountBar.bundle` at the app root, matching SwiftPM's generated `Bundle.module` lookup
+- `MenuBarIcon.png` under the standard `Contents/Resources` directory
 
 The script applies an ad-hoc signature recursively and verifies the signature. It does not claim Developer ID signing or notarization.
+
+The app resolves the packaged icon through `Bundle.main`. Raw SwiftPM development runs fall back to `Bundle.module`, and the local bundle builder copies the same icon into `Contents/Resources` so both bundle paths behave consistently.
 
 ## Automation
 
@@ -45,7 +47,7 @@ Packaging tests are shell-based because the release behavior is bundle structure
 
 - missing or malformed version arguments fail
 - the expected bundle metadata is present
-- the executable and SwiftPM resource bundle are included
+- the executable and menu bar icon resource are included
 - the packaged executable is arm64
 - the app signature validates
 - the ZIP expands to the expected app bundle
