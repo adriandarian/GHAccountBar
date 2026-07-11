@@ -107,15 +107,15 @@ The job checks out the tag, runs `swift test`, runs the packaging test with the 
 
 - [ ] **Step 2: Add README installation instructions**
 
-Add an `Install` section before `Build from Source` with the latest-release link, Apple Silicon/macOS 14 requirements, drag-to-Applications instructions, Control-click/Open first launch, and the existing `gh auth status` prerequisite.
+Add an `Install` section before `Build from Source` with the GitHub Releases page link, Apple Silicon/macOS 14 requirements, drag-to-Applications instructions, Control-click/Open first launch, and the existing `gh auth status` prerequisite. Use `/releases`, not `/releases/latest`, because GitHub excludes prereleases from its latest-release route.
 
 - [ ] **Step 3: Validate workflow and documentation**
 
 Run:
 
 ```bash
-ruby -e 'require "yaml"; YAML.load_file(".github/workflows/release.yml", aliases: true); puts "workflow yaml verified"'
-rg -n "releases/latest|Control-click|Apple Silicon|macOS 14" README.md .github/workflows/release.yml
+ruby -e 'require "yaml"; YAML.load_file(".github/workflows/release.yml"); puts "workflow yaml verified"'
+rg -n "GHAccountBar/releases|Control-click|Apple Silicon|macOS 14" README.md .github/workflows/release.yml
 git diff --check
 ```
 

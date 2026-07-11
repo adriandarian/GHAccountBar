@@ -57,7 +57,7 @@ The existing `swift test` suite must remain green.
 
 ## Documentation
 
-The README gains an Install section that links to the latest GitHub release, explains that the first release supports Apple Silicon and requires macOS 14+, and gives the first-launch instructions: move the app into Applications, then Control-click the app and choose Open. It also states that `gh` must already be installed and authenticated.
+The README gains an Install section that links to the repository's GitHub Releases page, explains that the first release supports Apple Silicon and requires macOS 14+, and gives the first-launch instructions: move the app into Applications, then Control-click the app and choose Open. It also states that `gh` must already be installed and authenticated. The releases-page link is intentional because GitHub's `/releases/latest` route excludes prereleases.
 
 ## Version-Control and Release Integrity
 

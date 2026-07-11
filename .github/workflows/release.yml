@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Run Swift tests
+        run: swift test
+
+      - name: Build and verify release package
+        env:
+          VERSION_TAG: ${{ github.ref_name }}
+        run: |
+          version="${VERSION_TAG#v}"
+          bash Tests/Packaging/package_release_test.sh "$version" "$GITHUB_RUN_NUMBER"
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          version="${tag#v}"
+          zip="dist/GHAccountBar-v${version}-arm64.zip"
+          checksum="${zip}.sha256"
+          notes="$RUNNER_TEMP/release-notes.md"
+
+          cat >"$notes" <<'NOTES'
+          Apple Silicon prerelease for macOS 14 or newer.
+
+          ## Install
+
+          1. Download and expand `GHAccountBar-…-arm64.zip`.
+          2. Move `GHAccountBar.app` into Applications.
+          3. On first launch, Control-click the app, choose **Open**, then confirm **Open**.
+
+          GitHub CLI must already be installed and authenticated. Check it with `gh auth status`.
+
+          This free GitHub build is ad-hoc signed and is not Apple-notarized, so macOS requires the one-time Control-click launch.
+          NOTES
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$zip" "$checksum" --clobber
+            gh release edit "$tag" --prerelease --title "GHAccountBar $tag" --notes-file "$notes"
+          else
+            gh release create "$tag" "$zip" "$checksum" \
+              --verify-tag \
+              --prerelease \
+              --latest=false \
+              --title "GHAccountBar $tag" \
+              --notes-file "$notes"
+          fi

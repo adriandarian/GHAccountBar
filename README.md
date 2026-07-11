@@ -27,6 +27,16 @@ Check your CLI auth state before running:
 gh auth status
 ```
 
+## Install
+
+The `v0.1` prerelease supports Apple Silicon Macs running macOS 14 or newer.
+
+1. Download the arm64 ZIP from [GitHub Releases](https://github.com/adriandarian/GHAccountBar/releases).
+2. Expand it and move `GHAccountBar.app` into Applications.
+3. On first launch, Control-click the app, choose **Open**, then confirm **Open**.
+
+The one-time Control-click is required because the free GitHub build is ad-hoc signed rather than Apple-notarized.
+
 ## Build from Source
 
 Building requires the Swift 6.3 toolchain. Create and open a local app bundle with:
