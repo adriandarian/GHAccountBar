@@ -20,6 +20,9 @@ private enum AppRuntime {
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let client = GHClient()
+    private let colorStore = GHAccountColorStore()
+    private var accounts: [GHAccount] = []
+    private var colorPanelSelection: AccountSelection?
     private var refreshTimer: Timer?
     private var refreshTask: Task<Void, Never>?
 
@@ -32,6 +35,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
         refreshTask?.cancel()
+        NotificationCenter.default.removeObserver(self)
     }
 
     private func configureStatusItem() {
@@ -88,6 +92,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func renderMenu(accounts: [GHAccount]) {
+        self.accounts = accounts
         let menu = NSMenu()
         menu.delegate = self
         let showsHost = Set(accounts.map(\.host)).count > 1
@@ -103,12 +108,38 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
                 item.target = self
                 item.state = account.active ? .on : .off
                 item.isEnabled = !account.active
-                item.representedObject = AccountSelection(host: account.host, login: account.login)
+                item.image = GHColorSwatch.image(color: colorStore.color(for: account))
+                item.representedObject = AccountSelection(account: account)
                 menu.addItem(item)
             }
         }
 
         menu.addItem(.separator())
+
+        if let activeAccount = accounts.first(where: \.active) {
+            let activeSelection = AccountSelection(account: activeAccount)
+            let colorItem = NSMenuItem(
+                title: "Set Color for \(displayName(for: activeAccount, showsHost: showsHost))...",
+                action: #selector(chooseAccountColor(_:)),
+                keyEquivalent: ""
+            )
+            colorItem.target = self
+            colorItem.image = GHColorSwatch.image(color: colorStore.color(for: activeAccount))
+            colorItem.representedObject = activeSelection
+            menu.addItem(colorItem)
+
+            let resetColorItem = NSMenuItem(
+                title: "Reset Color for \(displayName(for: activeAccount, showsHost: showsHost))",
+                action: #selector(resetAccountColor(_:)),
+                keyEquivalent: ""
+            )
+            resetColorItem.target = self
+            resetColorItem.representedObject = activeSelection
+            resetColorItem.isEnabled = colorStore.hasCustomColor(for: activeAccount)
+            menu.addItem(resetColorItem)
+
+            menu.addItem(.separator())
+        }
 
         let refreshItem = NSMenuItem(title: "Refresh", action: #selector(refreshMenu(_:)), keyEquivalent: "r")
         refreshItem.target = self
@@ -148,12 +179,30 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
         statusItem.button?.title = GHStatusBarDisplay.errorTitle()
         statusItem.button?.toolTip = GHStatusBarDisplay.errorTooltip()
+        statusItem.button?.image = GHMenuBarIcon.image()
+        statusItem.button?.contentTintColor = nil
         statusItem.menu = menu
     }
 
     private func updateButtonTitle(accounts: [GHAccount]) {
         statusItem.button?.title = GHStatusBarDisplay.title(for: accounts)
         statusItem.button?.toolTip = GHStatusBarDisplay.tooltip(for: accounts)
+        updateButtonIcon(accounts: accounts)
+    }
+
+    private func updateButtonIcon(accounts: [GHAccount]) {
+        guard let activeAccount = accounts.first(where: \.active) else {
+            statusItem.button?.image = GHMenuBarIcon.image()
+            statusItem.button?.contentTintColor = nil
+            return
+        }
+
+        statusItem.button?.image = GHMenuBarIcon.image(tintColor: colorStore.color(for: activeAccount))
+        statusItem.button?.contentTintColor = nil
+    }
+
+    private func displayName(for account: GHAccount, showsHost: Bool) -> String {
+        showsHost ? "\(account.login) (\(account.host))" : account.login
     }
 
     @objc private func selectAccount(_ sender: NSMenuItem) {
@@ -171,6 +220,50 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
                 renderErrorMenu(error)
             }
         }
+    }
+
+    @objc private func chooseAccountColor(_ sender: NSMenuItem) {
+        guard let selection = sender.representedObject as? AccountSelection else {
+            return
+        }
+
+        colorPanelSelection = selection
+        let panel = NSColorPanel.shared
+        panel.showsAlpha = false
+        panel.mode = .wheel
+        panel.color = colorStore.color(for: selection)
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSColorPanel.colorDidChangeNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(accountColorChanged(_:)),
+            name: NSColorPanel.colorDidChangeNotification,
+            object: panel
+        )
+        panel.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func accountColorChanged(_ notification: Notification) {
+        guard let selection = colorPanelSelection else {
+            return
+        }
+
+        let panel = notification.object as? NSColorPanel ?? NSColorPanel.shared
+        colorStore.setColor(panel.color, for: selection)
+        updateButtonIcon(accounts: accounts)
+    }
+
+    @objc private func resetAccountColor(_ sender: NSMenuItem) {
+        guard let selection = sender.representedObject as? AccountSelection else {
+            return
+        }
+
+        colorStore.resetColor(for: selection)
+        updateButtonIcon(accounts: accounts)
     }
 
     @objc private func refreshMenu(_ sender: NSMenuItem) {
@@ -192,9 +285,126 @@ private final class AccountSelection: NSObject {
     let host: String
     let login: String
 
+    var id: String {
+        "\(host)/\(login)"
+    }
+
+    init(account: GHAccount) {
+        self.host = account.host
+        self.login = account.login
+    }
+
     init(host: String, login: String) {
         self.host = host
         self.login = login
+    }
+}
+
+private final class GHAccountColorStore {
+    private let defaults: UserDefaults
+    private let keyPrefix = "accountColor."
+    private let defaultColors = [
+        "#0969DA",
+        "#8250DF",
+        "#1A7F37",
+        "#BC4C00",
+        "#BF3989",
+        "#1B7C83",
+    ]
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func color(for account: GHAccount) -> NSColor {
+        color(forID: account.id)
+    }
+
+    func color(for selection: AccountSelection) -> NSColor {
+        color(forID: selection.id)
+    }
+
+    func hasCustomColor(for account: GHAccount) -> Bool {
+        defaults.string(forKey: key(forID: account.id)) != nil
+    }
+
+    func setColor(_ color: NSColor, for selection: AccountSelection) {
+        defaults.set(hexString(for: color), forKey: key(forID: selection.id))
+    }
+
+    func resetColor(for selection: AccountSelection) {
+        defaults.removeObject(forKey: key(forID: selection.id))
+    }
+
+    private func color(forID id: String) -> NSColor {
+        if let storedHex = defaults.string(forKey: key(forID: id)),
+           let storedColor = NSColor(hexString: storedHex) {
+            return storedColor
+        }
+
+        let colorIndex = stableColorIndex(for: id)
+        return NSColor(hexString: defaultColors[colorIndex]) ?? .controlAccentColor
+    }
+
+    private func key(forID id: String) -> String {
+        keyPrefix + id
+    }
+
+    private func hexString(for color: NSColor) -> String {
+        guard let rgbColor = color.usingColorSpace(.sRGB) else {
+            return "#0969DA"
+        }
+
+        let red = Int((rgbColor.redComponent * 255).rounded())
+        let green = Int((rgbColor.greenComponent * 255).rounded())
+        let blue = Int((rgbColor.blueComponent * 255).rounded())
+        return String(format: "#%02X%02X%02X", red, green, blue)
+    }
+
+    private func stableColorIndex(for id: String) -> Int {
+        var hash = 5381
+        for scalar in id.unicodeScalars {
+            hash = (hash &* 33) &+ Int(scalar.value)
+        }
+
+        return Int(hash.magnitude % UInt(defaultColors.count))
+    }
+}
+
+private extension NSColor {
+    convenience init?(hexString: String) {
+        let trimmedHex = hexString.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        guard trimmedHex.count == 6,
+              let value = Int(trimmedHex, radix: 16) else {
+            return nil
+        }
+
+        let red = CGFloat((value >> 16) & 0xFF) / 255.0
+        let green = CGFloat((value >> 8) & 0xFF) / 255.0
+        let blue = CGFloat(value & 0xFF) / 255.0
+        self.init(srgbRed: red, green: green, blue: blue, alpha: 1)
+    }
+}
+
+private enum GHColorSwatch {
+    static func image(color: NSColor) -> NSImage {
+        let size = NSSize(width: 12, height: 12)
+        let image = NSImage(size: size)
+
+        image.lockFocus()
+        defer { image.unlockFocus() }
+
+        let bounds = NSRect(origin: .zero, size: size)
+        let swatch = NSBezierPath(ovalIn: bounds.insetBy(dx: 2, dy: 2))
+        color.setFill()
+        swatch.fill()
+
+        NSColor.separatorColor.setStroke()
+        swatch.lineWidth = 1
+        swatch.stroke()
+
+        image.isTemplate = false
+        return image
     }
 }
 
@@ -279,7 +489,44 @@ private struct GHProcessError: Error, CustomStringConvertible {
 }
 
 private enum GHMenuBarIcon {
-    static func image() -> NSImage {
+    static func image(tintColor: NSColor? = nil) -> NSImage {
+        let image = templateImage()
+        guard let tintColor else {
+            return image
+        }
+
+        return tintedImage(from: image, color: tintColor)
+    }
+
+    private static func templateImage() -> NSImage {
+        if let url = Bundle.module.url(forResource: "MenuBarIcon", withExtension: "png"),
+           let image = NSImage(contentsOf: url) {
+            image.size = NSSize(width: 18, height: 18)
+            image.isTemplate = true
+            image.accessibilityDescription = "GitHub account switcher"
+            return image
+        }
+
+        return fallbackImage()
+    }
+
+    private static func tintedImage(from image: NSImage, color: NSColor) -> NSImage {
+        let tintedImage = NSImage(size: image.size)
+        let rect = NSRect(origin: .zero, size: image.size)
+
+        tintedImage.lockFocus()
+        defer { tintedImage.unlockFocus() }
+
+        color.setFill()
+        rect.fill()
+        image.draw(in: rect, from: .zero, operation: .destinationIn, fraction: 1)
+
+        tintedImage.isTemplate = false
+        tintedImage.accessibilityDescription = image.accessibilityDescription
+        return tintedImage
+    }
+
+    private static func fallbackImage() -> NSImage {
         let size = NSSize(width: 18, height: 18)
         let image = NSImage(size: size)
 

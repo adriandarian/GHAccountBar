@@ -18,7 +18,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "GHAccountBar",
-            dependencies: ["GHAccountBarCore"]
+            dependencies: ["GHAccountBarCore"],
+            resources: [
+                .process("Resources"),
+            ]
         ),
         .testTarget(
             name: "GHAccountBarTests",
