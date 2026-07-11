@@ -6,7 +6,7 @@ Publish GHAccountBar `v0.1.0` as a free GitHub prerelease that users can downloa
 
 ## Distribution Model
 
-GitHub Releases is the canonical download channel. A version tag matching `v*` starts a GitHub Actions workflow on the standard `macos-15` arm64 runner. The workflow packages the tagged source and publishes two release assets:
+GitHub Releases is the canonical download channel. A version tag matching `v*` starts a GitHub Actions workflow on the standard `macos-26` arm64 runner. The workflow packages the tagged source and publishes two release assets:
 
 - `GHAccountBar-v0.1.0-arm64.zip`
 - `GHAccountBar-v0.1.0-arm64.zip.sha256`
@@ -39,7 +39,7 @@ The app resolves the packaged icon through `Bundle.main`. Raw SwiftPM developmen
 4. Verifies the app architecture is arm64, validates the property list and signature, expands the ZIP, and checks the packaged app.
 5. Publishes the ZIP and checksum to a GitHub prerelease using the repository's `GITHUB_TOKEN`.
 
-The workflow uses only GitHub-provided actions and the public repository's standard macOS runner, so it requires no paid services or repository secrets. It selects the runner's bundled Xcode 26.3 toolchain through `DEVELOPER_DIR` because the runner's default Xcode 16.4 toolchain provides Swift 6.1, while the package requires Swift 6.3.
+The workflow uses only GitHub-provided actions and the public repository's standard macOS runner, so it requires no paid services or repository secrets. It selects the runner's bundled Xcode 26.6 toolchain through `DEVELOPER_DIR`; that toolchain provides Swift 6.3, matching the package requirement.
 
 ## Local Verification
 
