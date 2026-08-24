@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WORKFLOW="$ROOT_DIR/.github/workflows/release.yml"
 README="$ROOT_DIR/README.md"
+RELEASE_NOTES="$ROOT_DIR/docs/releases/v0.2.0.md"
 
 fail() {
   echo "release_workflow_test: $*" >&2
@@ -11,6 +12,7 @@ fail() {
 }
 
 test -f "$WORKFLOW" || fail "release workflow is missing"
+test -f "$RELEASE_NOTES" || fail "versioned release notes are missing"
 
 ruby -e 'require "yaml"; YAML.load_file(ARGV.fetch(0))' "$WORKFLOW"
 
@@ -28,5 +30,7 @@ rg -q -- '--prerelease' "$WORKFLOW" || fail "workflow does not mark the release 
 rg -q 'github\.com/adriandarian/GHAccountBar/releases' "$README" || fail "README does not link to GitHub Releases"
 rg -q 'Apple Silicon' "$README" || fail "README does not state architecture support"
 rg -q 'Control-click' "$README" || fail "README does not explain the first launch"
+rg -q 'docs/releases/v0\.2\.0\.md' "$README" || fail "README does not link versioned release notes"
+rg -F -q 'docs/releases/v${version}.md' "$WORKFLOW" || fail "workflow does not consume checked-in release notes"
 
 echo "release workflow verified"

@@ -29,7 +29,7 @@ gh auth status
 
 ## Install
 
-The `v0.1` prerelease supports Apple Silicon Macs running macOS 14 or newer.
+The `v0.2.0` prerelease supports Apple Silicon Macs running macOS 14 or newer. See the [0.2.0 release notes](docs/releases/v0.2.0.md) for the full change list.
 
 1. Download the arm64 ZIP from [GitHub Releases](https://github.com/adriandarian/GHAccountBar/releases).
 2. Expand it and move `GHAccountBar.app` into Applications.

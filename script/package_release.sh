@@ -7,6 +7,10 @@ APP_NAME="GHAccountBar"
 BUNDLE_ID="com.adriandarian.GHAccountBar"
 MIN_SYSTEM_VERSION="14.0"
 ICON_SOURCE="Sources/GHAccountBar/Resources/MenuBarIcon.png"
+# Use an Apple signing identity when a matching certificate *and private key*
+# are installed in the login keychain. The default preserves the free,
+# ad-hoc-signed release workflow.
+SIGNING_IDENTITY="${SIGNING_IDENTITY:--}"
 
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
   echo "usage: $0 <semantic-version> [positive-build-number]" >&2
@@ -79,7 +83,7 @@ cat >"$INFO_PLIST" <<PLIST
 PLIST
 
 plutil -lint "$INFO_PLIST" >/dev/null
-codesign --force --deep --sign - "$APP_BUNDLE"
+codesign --force --deep --sign "$SIGNING_IDENTITY" "$APP_BUNDLE"
 codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 
 (
@@ -90,3 +94,4 @@ codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 
 echo "Created $ZIP_PATH"
 echo "Created $CHECKSUM_PATH"
+echo "Signed with: $SIGNING_IDENTITY"
